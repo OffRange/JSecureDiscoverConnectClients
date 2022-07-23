@@ -1,4 +1,4 @@
-package de.offrange.client.udp.endpoint;
+package de.offrange.client.udp;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
@@ -7,7 +7,6 @@ import de.offrange.client.gson.ByteArrayTypeAdapter;
 import de.offrange.client.listeners.DiscoveryHandler;
 import de.offrange.client.listeners.ErrorOccurredHandler;
 import de.offrange.client.models.UdpModel;
-import de.offrange.client.udp.DiscoveredEndpoint;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

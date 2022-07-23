@@ -1,7 +1,7 @@
 package de.offrange.client.listeners;
 
 import de.offrange.client.udp.DiscoveredEndpoint;
-import de.offrange.client.udp.endpoint.DiscoveryClient;
+import de.offrange.client.udp.DiscoveryClient;
 
 import java.util.List;
 
