@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Class used to discovered open UDP servers on the local network.
+ * Class used to discover open UDP servers on the local network.
  */
 public class DiscoveryClient {
 
