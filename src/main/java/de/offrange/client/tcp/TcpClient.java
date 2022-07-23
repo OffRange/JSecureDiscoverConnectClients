@@ -10,6 +10,7 @@ import de.offrange.client.listeners.ReceiveHandler;
 import de.offrange.client.models.HandshakeModel;
 import de.offrange.client.models.IModel;
 import de.offrange.client.models.CodeCheckModel;
+import de.offrange.client.udp.endpoint.EndpointAddress;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -33,6 +34,8 @@ import java.util.Objects;
  */
 public class TcpClient<T extends IModel> {
 
+    private static TcpClient<?> instance;
+
     private final Gson gson;
 
     private final Socket client;
@@ -54,6 +57,17 @@ public class TcpClient<T extends IModel> {
     private final Class<T> modelClass;
 
     /**
+     * Constructs a TcpClient instance with a {@link EndpointAddress} and a class that is used to
+     * receive data from the server.It indicates a model that comes from the server as a response.
+     * The class must implement the {@link IModel} interface.
+     * @param endpointAddress the endpoint information containing hostname and port
+     * @param modelClass the model class that specifies the JSON data from the server.
+     */
+    public TcpClient(EndpointAddress endpointAddress, Class<T> modelClass) {
+        this(endpointAddress.getIp(), endpointAddress.getPort(), modelClass);
+    }
+
+    /**
      * Constructs a TcpClient instance with a host, port and a class that is used to
      * receive data from the server. It indicates a model that comes from the server as a response.
      * The class must implement the {@link IModel} interface.
@@ -62,6 +76,7 @@ public class TcpClient<T extends IModel> {
      * @param modelClass the model class that specifies the JSON data from the server.
      */
     public TcpClient(String host, int port, Class<T> modelClass){
+        instance = this;
         gson = new GsonBuilder()
                 .disableHtmlEscaping()
                 .registerTypeAdapter(byte[].class, new ByteArrayTypeAdapter())
@@ -81,6 +96,14 @@ public class TcpClient<T extends IModel> {
     }
 
     /**
+     * @return the currently running instance. Will be {@code null} if no instance is running,
+     * initiated or {@link #disconnect()} was called previous instance.
+     */
+    public static TcpClient<?> getInstance() {
+        return instance;
+    }
+
+    /**
      * Use {@link #setReceiveHandler(ReceiveHandler)} to set a {@code ReceiveHandler}.
      * @return {@link ReceiveHandler<T>} that is used to handle receive events.
      * @see #setReceiveHandler(ReceiveHandler)
@@ -91,7 +114,7 @@ public class TcpClient<T extends IModel> {
 
     /**
      * Sets the {@link ReceiveHandler} that can handle events such as {@link ReceiveHandler#onDataReceived(IModel)}
-     * and {@link ReceiveHandler#onCodeEvaluationReceived(boolean)}.
+     * and {@link ReceiveHandler#onCodeEvaluationReceived(boolean, TcpClient)}.
      * @param receiveHandler the {@code ReceiveHandler} that will handle the events.
      * @see #getReceiveHandler()
      */
@@ -150,6 +173,7 @@ public class TcpClient<T extends IModel> {
      * @see #startAndConnect()
      */
     public void disconnect(){
+        instance = null;
         if(!isRunning())
             return;
 
@@ -353,7 +377,7 @@ public class TcpClient<T extends IModel> {
 
     /**
      * Class extends {@link Thread} used to handle the communication between the server and this client.
-     * If the code evaluation is received, the class will call {@link ReceiveHandler#onCodeEvaluationReceived(boolean)}
+     * If the code evaluation is received, the class will call {@link ReceiveHandler#onCodeEvaluationReceived(boolean, TcpClient)}
      * and if data is received, the class will call {@link ReceiveHandler#onDataReceived(IModel)}. It also checks if the
      * connection is enabled and allow or disallow the communication to the server.
      */
@@ -382,7 +406,7 @@ public class TcpClient<T extends IModel> {
                     codeChecked = ((CodeCheckModel)model).isCodeCorrect();
 
                     if(getReceiveHandler() != null)
-                        getReceiveHandler().onCodeEvaluationReceived(codeChecked);
+                        getReceiveHandler().onCodeEvaluationReceived(codeChecked, TcpClient.this);
 
                     continue;
                 }
