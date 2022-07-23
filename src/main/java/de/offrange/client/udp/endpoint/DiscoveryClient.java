@@ -153,6 +153,7 @@ public class DiscoveryClient {
      * by the discovery process will be called within this new thread.
      */
     public void startDiscovering() {
+        discovering = true;
         DiscoveryThread discoveryThread = new DiscoveryThread();
         discoveryThread.setName(getName());
         discoveryThread.start();
@@ -184,8 +185,6 @@ public class DiscoveryClient {
         @Override
         public void run() {
             try{
-                discovering = true;
-
                 udp = new DatagramSocket();
                 udp.setBroadcast(true);
                 udp.setSoTimeout(timeout);
