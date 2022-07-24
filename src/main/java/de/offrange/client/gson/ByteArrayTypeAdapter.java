@@ -16,7 +16,7 @@ public class ByteArrayTypeAdapter extends TypeAdapter<byte[]> {
 
     @Override
     public void write(JsonWriter out, byte[] value) throws IOException {
-        out.value(Base64.getEncoder().encodeToString(value));
+        out.value(value == null ? null : Base64.getEncoder().encodeToString(value));
     }
 
     @Override
