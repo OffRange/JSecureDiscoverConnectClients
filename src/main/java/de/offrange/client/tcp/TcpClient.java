@@ -34,7 +34,7 @@ import java.util.Objects;
  */
 public class TcpClient<T extends IModel> {
 
-    private static TcpClient<?> instance;
+    private static TcpClient<? extends IModel> instance;
 
     private final Gson gson;
 
@@ -99,7 +99,7 @@ public class TcpClient<T extends IModel> {
      * @return the currently running instance. Will be {@code null} if no instance is running,
      * initiated or {@link #disconnect()} was called previous instance.
      */
-    public static TcpClient<?> getInstance() {
+    public static TcpClient<? extends IModel> getInstance() {
         return instance;
     }
 
