@@ -3,6 +3,7 @@ package de.offrange.client.tcp;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import de.offrange.client.Client;
 import de.offrange.client.RsaAesCryptography;
 import de.offrange.client.gson.ByteArrayTypeAdapter;
 import de.offrange.client.listeners.ErrorOccurredHandler;
@@ -32,7 +33,7 @@ import java.util.Objects;
  * Before that, the server and the client cannot communicate together.
  * @param <T> the model that represents the server requests and responses.
  */
-public class TcpClient<T extends IModel> {
+public class TcpClient<T extends IModel> implements Client {
 
     private static TcpClient<?> instance;
 
@@ -151,7 +152,7 @@ public class TcpClient<T extends IModel> {
         if(errorOccurredHandler == null)
             return;
 
-        errorOccurredHandler.onErrorOccurred(e, type);
+        errorOccurredHandler.onErrorOccurred(this, e, type);
     }
 
     /**
@@ -168,7 +169,7 @@ public class TcpClient<T extends IModel> {
 
     /**
      * Disconnect and stop the client. If an I/O error occurs when closing the socket, it will call
-     * {@link de.offrange.client.listeners.ErrorOccurredHandler#onErrorOccurred(Exception, ErrorOccurredHandler.Type)}.
+     * {@link de.offrange.client.listeners.ErrorOccurredHandler#onErrorOccurred(Client, Exception, ErrorOccurredHandler.Type)}.
      * When such an error occurs, {@link ErrorOccurredHandler.Type} will be {@link ErrorOccurredHandler.Type#DISCONNECT}.
      * @see #startAndConnect()
      */
@@ -190,7 +191,7 @@ public class TcpClient<T extends IModel> {
      * the server and generates an AES key, which is encrypted using the RSA public key, and then sends the
      * encrypted AES key back to the server.
      * <br>
-     * {@link de.offrange.client.listeners.ErrorOccurredHandler#onErrorOccurred(Exception, ErrorOccurredHandler.Type)}
+     * {@link de.offrange.client.listeners.ErrorOccurredHandler#onErrorOccurred(Client, Exception, ErrorOccurredHandler.Type)}
      * is called if the server does not send RSA key information.
      * {@link ErrorOccurredHandler.Type} will be {@link ErrorOccurredHandler.Type#HANDSHAKE}.
      * @throws IOException the stream has been closed and the contained input stream does not support reading
@@ -253,7 +254,7 @@ public class TcpClient<T extends IModel> {
      * encrypted with an AES key. In order to be able to send data you must enable the connection
      * by calling {@link #sendCode(String)}.
      * <br>
-     * {@link de.offrange.client.listeners.ErrorOccurredHandler#onErrorOccurred(Exception, ErrorOccurredHandler.Type)}
+     * {@link de.offrange.client.listeners.ErrorOccurredHandler#onErrorOccurred(Client, Exception, ErrorOccurredHandler.Type)}
      * is called if the handshake is not yet complete or the connection is not enabled.
      * {@link ErrorOccurredHandler.Type} will be {@link ErrorOccurredHandler.Type#SEND}.
      * @param model JSON model to send.
@@ -276,7 +277,7 @@ public class TcpClient<T extends IModel> {
      * Sends a JSON model that implements the {@link IModel} interface to the server,
      * requires a key to encrypt the data.
      * <br>
-     * {@link de.offrange.client.listeners.ErrorOccurredHandler#onErrorOccurred(Exception, ErrorOccurredHandler.Type)}
+     * {@link de.offrange.client.listeners.ErrorOccurredHandler#onErrorOccurred(Client, Exception, ErrorOccurredHandler.Type)}
      * is called if {@link #isRunning()} returns false or an exception occurs while writing data.
      * In both cases, {@link ErrorOccurredHandler.Type} will be {@link ErrorOccurredHandler.Type#SEND}.
      *
@@ -304,7 +305,7 @@ public class TcpClient<T extends IModel> {
 
     /**
      * Receives data from the server and decrypt them. If an error occurs, it will call
-     * {@link de.offrange.client.listeners.ErrorOccurredHandler#onErrorOccurred(Exception, ErrorOccurredHandler.Type)}.
+     * {@link de.offrange.client.listeners.ErrorOccurredHandler#onErrorOccurred(Client, Exception, ErrorOccurredHandler.Type)}.
      * When such an error occurs, {@link ErrorOccurredHandler.Type} will be {@link ErrorOccurredHandler.Type#RECEIVE}
      * and the function will return {@code null}.
      * @return a {@link IModel} that represents the JSON file sent by the server.
@@ -329,7 +330,7 @@ public class TcpClient<T extends IModel> {
      * Waits the current thread until the handshake completes. If the handshake is already completed, it
      * will not pause the thread.
      * <br>
-     * {@link de.offrange.client.listeners.ErrorOccurredHandler#onErrorOccurred(Exception, ErrorOccurredHandler.Type)}
+     * {@link de.offrange.client.listeners.ErrorOccurredHandler#onErrorOccurred(Client, Exception, ErrorOccurredHandler.Type)}
      * is called if there is already a thread waiting for the handshake to complete.
      * In this case, {@link ErrorOccurredHandler.Type} will be {@link ErrorOccurredHandler.Type#HANDSHAKE}.
      * @throws InterruptedException if any thread interrupted the current thread before or while the current thread

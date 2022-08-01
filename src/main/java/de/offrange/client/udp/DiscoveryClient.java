@@ -3,6 +3,7 @@ package de.offrange.client.udp;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import de.offrange.client.Client;
 import de.offrange.client.gson.ByteArrayTypeAdapter;
 import de.offrange.client.listeners.DiscoveryHandler;
 import de.offrange.client.listeners.ErrorOccurredHandler;
@@ -20,7 +21,7 @@ import java.util.List;
 /**
  * Class used to discover open UDP servers on the local network.
  */
-public class DiscoveryClient {
+public class DiscoveryClient implements Client {
 
     public static final String BROADCAST_IP = "255.255.255.255";
     public static final String DEFAULT_NAME = "udp-discover-client";
@@ -175,7 +176,7 @@ public class DiscoveryClient {
                 udp.setSoTimeout(0);
         }catch (SocketException e){
             if(errorOccurredHandler != null)
-                errorOccurredHandler.onErrorOccurred(e, ErrorOccurredHandler.Type.UDP_CANCEL);
+                errorOccurredHandler.onErrorOccurred(this, e, ErrorOccurredHandler.Type.UDP_CANCEL);
         }
     }
 
@@ -220,7 +221,7 @@ public class DiscoveryClient {
                             continue;
 
                         if(errorOccurredHandler != null)
-                            errorOccurredHandler.onErrorOccurred(e, ErrorOccurredHandler.Type.UDP_DISCOVERING);
+                            errorOccurredHandler.onErrorOccurred(DiscoveryClient.this, e, ErrorOccurredHandler.Type.UDP_DISCOVERING);
                     }
                 }
 
@@ -231,7 +232,7 @@ public class DiscoveryClient {
                     discoveryHandler.onFinish(endpoints);
             }catch (IOException e){
                 if(errorOccurredHandler != null)
-                    errorOccurredHandler.onErrorOccurred(e, ErrorOccurredHandler.Type.UDP_DISCOVERING);
+                    errorOccurredHandler.onErrorOccurred(DiscoveryClient.this, e, ErrorOccurredHandler.Type.UDP_DISCOVERING);
             }
         }
     }

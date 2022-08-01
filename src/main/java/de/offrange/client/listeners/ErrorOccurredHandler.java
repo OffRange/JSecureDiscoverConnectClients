@@ -1,21 +1,23 @@
 package de.offrange.client.listeners;
 
+import de.offrange.client.Client;
 import de.offrange.client.udp.DiscoveryClient;
 
 /**
  * Interface used to catch all kinds of errors and exceptions encountered on the
  * {@link DiscoveryClient} and/or {@link de.offrange.client.tcp.TcpClient} side.
- * @see #onErrorOccurred(Exception, Type)
+ * @see #onErrorOccurred(Client, Exception, Type)
  */
 public interface ErrorOccurredHandler {
 
     /**
      * Called if any error or exception occurs.
+     * @param client the client sender sending the exception
      * @param exception the exception that is thrown.
      * @param type represents the state in which the error/exception occurs.
      * @see Type
      */
-    void onErrorOccurred(Exception exception, Type type);
+    void onErrorOccurred(Client client, Exception exception, Type type);
 
     /**
      * Enum representing the state in which the error/exception occurred.
