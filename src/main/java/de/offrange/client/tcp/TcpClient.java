@@ -230,7 +230,7 @@ public class TcpClient<T extends IModel> implements Client {
     }
 
     /**
-     * @return true if the code has been checked and successful, false otherwise.
+     * @return true if the code has been reviewed and is correct, false otherwise.
      */
     public boolean isCodeChecked() {
         return codeChecked;
