@@ -35,7 +35,7 @@ import java.util.Objects;
  */
 public class TcpClient<T extends IModel> implements Client {
 
-    private static TcpClient<?> instance;
+    private static TcpClient<? extends IModel> instance;
 
     private final Gson gson;
 
@@ -99,9 +99,11 @@ public class TcpClient<T extends IModel> implements Client {
     /**
      * @return the currently running instance. Will be {@code null} if no instance is running,
      * initiated or {@link #disconnect()} was called previous instance.
+     * @param <T> the JSON model class that is used to send.
      */
-    public static TcpClient<?> getInstance() {
-        return instance;
+    @SuppressWarnings("unchecked")
+    public static <T extends IModel> TcpClient<T> getInstance() {
+        return (TcpClient<T>) instance;
     }
 
     /**
