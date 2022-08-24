@@ -171,6 +171,9 @@ public class DiscoveryClient implements Client {
      */
     public void cancelDiscovering(){
         discovering = false;
+        if(udp == null)
+            return;
+
         try{
             if(!udp.isClosed())
                 udp.setSoTimeout(0);

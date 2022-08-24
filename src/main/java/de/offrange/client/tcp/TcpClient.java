@@ -177,7 +177,7 @@ public class TcpClient<T extends IModel> implements Client {
      */
     public void disconnect(){
         instance = null;
-        if(!isRunning())
+        if(client == null || !isRunning())
             return;
 
         running = false;
