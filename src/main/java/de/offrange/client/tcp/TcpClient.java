@@ -18,6 +18,7 @@ import javax.crypto.SecretKey;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.security.Key;
@@ -35,6 +36,8 @@ import java.util.Objects;
  */
 public class TcpClient<T extends IModel> implements Client {
 
+    private static final int DEFAULT_TIMEOUT = 5000;
+
     private static TcpClient<? extends IModel> instance;
 
     private final Gson gson;
@@ -46,6 +49,8 @@ public class TcpClient<T extends IModel> implements Client {
     private boolean running;
     private boolean handshakeDone;
     private boolean codeChecked;
+
+    private int timeout = DEFAULT_TIMEOUT;
 
     private ReceiveHandler<T> receiveHandler;
     private ErrorOccurredHandler errorOccurredHandler;
@@ -158,12 +163,45 @@ public class TcpClient<T extends IModel> implements Client {
     }
 
     /**
+     * @return an {@link EndpointAddress} object that contains the server's hostname and port.
+     */
+    public EndpointAddress getRemoteAddress() {
+        return new EndpointAddress(address.getHostName(), address.getPort());
+    }
+
+    /**
+     * @param timeout the time the client times out and returns.
+     * @return the elapsed time in milliseconds.
+     * @throws IOException if the hostname is unknown or the timeout is negative.
+     */
+    public int getLatency(int timeout) throws IOException {
+        long startTime = System.currentTimeMillis();
+        InetAddress.getByName(address.getHostName()).isReachable(timeout);
+        return (int)(System.currentTimeMillis() - startTime);
+    }
+
+    /**
+     * @return the timeout value in milliseconds (default: {@link TcpClient#DEFAULT_TIMEOUT}).
+     */
+    public int getTimeout() {
+        return timeout;
+    }
+
+    /**
+     * Sets the timeout used for the connection.
+     * @param timeout the timeout value to be used in milliseconds.
+     */
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
+    }
+
+    /**
      * Start the client and connect it to the server specified in the constructor.
      * @throws IOException if an error occurs during the connection.
      * @see #disconnect()
      */
     public void startAndConnect() throws IOException {
-        client.connect(address, 5000);
+        client.connect(address, timeout);
 
         ClientHandler handler = new ClientHandler();
         handler.start();
