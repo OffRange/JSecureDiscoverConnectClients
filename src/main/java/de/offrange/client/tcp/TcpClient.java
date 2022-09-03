@@ -166,7 +166,7 @@ public class TcpClient<T extends IModel> implements Client {
      * @return an {@link EndpointAddress} object that contains the server's hostname and port.
      */
     public EndpointAddress getRemoteAddress() {
-        return new EndpointAddress(address.getHostName(), address.getPort());
+        return new EndpointAddress(address.getAddress().getHostAddress(), address.getPort());
     }
 
     /**
@@ -176,7 +176,7 @@ public class TcpClient<T extends IModel> implements Client {
      */
     public int getLatency(int timeout) throws IOException {
         long startTime = System.currentTimeMillis();
-        InetAddress.getByName(address.getHostName()).isReachable(timeout);
+        InetAddress.getByName(address.getHostString()).isReachable(timeout);
         return (int)(System.currentTimeMillis() - startTime);
     }
 
